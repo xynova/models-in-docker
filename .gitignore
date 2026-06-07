@@ -1,0 +1,5 @@
+# Model weights — never commit; place files here before building
+**/model-files/*
+!**/model-files/.gitkeep
+
+.DS_Store
