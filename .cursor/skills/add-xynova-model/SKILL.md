@@ -35,7 +35,7 @@ Copy this checklist and track progress:
 |------|---------|---------------------|
 | Single GGUF | gemma-model | `model-files/{name}.gguf` |
 | GGUF + mmproj | qwen-model, gemma4-12B | `model-files/{main}.gguf` + `model-files/{mmproj}.gguf` |
-| HuggingFace dir | bge-base-model | `model-files/{model-dir}/` |
+| HuggingFace dir | (example) | `model-files/{model-dir}/` |
 
 All weights live in `{model-dir}/model-files/` (gitignored). Dockerfiles COPY from `model-files/` and place artifacts at image root (`/filename.gguf` or `/model-dir/`).
 

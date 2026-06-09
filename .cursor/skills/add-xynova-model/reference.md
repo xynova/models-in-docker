@@ -7,7 +7,7 @@
 | gemma-model | xynova/gemma-model | `gemma-3n-E4B-it-Q6_K.gguf` | `/gemma-3n-E4B-it-Q6_K.gguf` |
 | gemma4-12B | xynova/gemma4-12b-model | `gemma-4-12B-it-QAT-Q4_0.gguf`, `mmproj-...gguf` | `/gemma-4-12B-it-QAT-Q4_0.gguf`, `/mmproj-gemma-4-12B-it-QAT-BF16.gguf` |
 | qwen-model | xynova/qwen-model | `Qwen3VL-4B-Instruct-Q4_K_M.gguf`, `mmproj-...gguf` | `/Qwen3VL-4B-Instruct-Q4_K_M.gguf`, `/mmproj-Qwen3VL-4B-Instruct-F16.gguf` |
-| bge-base-model | xynova/bge-base-model | `bge-base-en-v1.5/` (directory) | `/bge-base-en-v1.5/` (directory) |
+| bge-base-model | xynova/bge-base-model | `bge-base-en-v1.5-q4_k_m.gguf` | `/bge-base-en-v1.5-q4_k_m.gguf` |
 
 Update this table when adding a model.
 

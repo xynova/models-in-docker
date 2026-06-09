@@ -30,6 +30,6 @@ docker rm t
 **bge-base-model**
 ```bash
 docker create --name t xynova/bge-base-model:latest
-docker cp t:/bge-base-en-v1.5 .
+docker cp t:/bge-base-en-v1.5-q4_k_m.gguf .
 docker rm t
 ```
