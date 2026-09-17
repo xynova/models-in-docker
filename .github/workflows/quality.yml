@@ -1,0 +1,76 @@
+# Fail-closed quality gates for Go tools (PR + push to main).
+# Site/catalog build + link check lives in library-site.yml.
+name: Quality
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/library-intake/**"
+      - "tools/cloudrun-proxy/**"
+      - ".github/workflows/quality.yml"
+  pull_request:
+    paths:
+      - "tools/library-intake/**"
+      - "tools/cloudrun-proxy/**"
+      - ".github/workflows/quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "quality-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  library-intake:
+    name: library-intake
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/library-intake
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/library-intake/go.mod
+          cache-dependency-path: tools/library-intake/go.sum
+
+      - name: Vet
+        run: make vet
+
+      - name: Test
+        run: make test
+
+  cloudrun-proxy:
+    name: cloudrun-proxy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/cloudrun-proxy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/cloudrun-proxy/go.mod
+          cache-dependency-path: tools/cloudrun-proxy/go.sum
+
+      - name: Vet
+        run: make vet
+
+      - name: Test
+        run: make test
+
+      - name: Build
+        run: make build

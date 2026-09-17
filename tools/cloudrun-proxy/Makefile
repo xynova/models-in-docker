@@ -1,4 +1,4 @@
-.PHONY: run build tidy clean smoke help
+.PHONY: run build tidy clean smoke vet test help
 
 CMD := ./cmd/cloudrun-proxy
 BINARY := bin/cloudrun-proxy
@@ -22,6 +22,12 @@ start: build ## Run the built binary
 
 tidy: ## go mod tidy
 	go mod tidy
+
+vet: ## go vet
+	go vet ./...
+
+test: ## go test
+	go test ./...
 
 clean: ## Remove build artifacts
 	rm -rf bin
