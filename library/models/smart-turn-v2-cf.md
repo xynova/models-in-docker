@@ -1,7 +1,7 @@
 ---
 name: smart-turn-v2-cf
 title: Pipecat Smart Turn v2 (Cloudflare)
-summary: "Open turn-completion classifier on Workers AI: raw-audio probability that the user finished speaking at $0.000338/audio min—not STT or TTS."
+summary: "Turn-end classifier on Workers AI (~$0.000338/audio min); pair with local VAD and VAD-gated streaming STT to avoid idle WebSocket cost."
 category: models
 does: speech
 tags:
@@ -42,6 +42,42 @@ Cheap, vendor-neutral **“has the user finished?”** layer for modular voice a
 - **Gemini-centric transcript path:** Gemini 3.5 Transcribe Live for text, Smart Turn v2 if you want custom turn logic separate from Google’s Smart mode.
 
 Prefer **Deepgram Flux** when you want one WebSocket service for live transcript **and** agent turn events (~$0.0077/min, ~23× Smart Turn list price) with fewer moving parts.
+
+## VAD-gated STT (production)
+
+To avoid paying for streaming STT during silence or while the agent speaks, keep only a **cheap local VAD** (default: **Silero VAD** / `@ricky0123/vad-web` in the browser; see `silero-vad`) while idle or during TTS. Open the paid cloud STT WebSocket only for active user turns; after Smart Turn confirms end-of-turn, finalise the transcript and **close or pause** the STT socket before LLM + TTS.
+
+```text
+Idle / agent speaking
+  → local VAD listens for speech only
+Speech starts → open cloud STT WebSocket
+User finishes → Smart Turn confirms end of turn
+  → finalise transcript → close/pause cloud STT
+  → LLM + TTS respond
+User interrupts (VAD) → stop TTS → reopen STT (+ short ring buffer)
+```
+
+Smart Turn does **not** detect initial speech (VAD does). It decides whether a pause is a **real endpoint** so you can stop forwarding mic audio to Flux, Gemini Transcribe Live, Nova-3 WebSocket, or similar without guessing.
+
+| Mode | Active while idle | Cost | Best for |
+|------|-------------------|------|----------|
+| Persistent cloud STT | STT WebSocket on all audio | Highest (silence + agent speech) | Prototypes |
+| **VAD-gated STT** | Local VAD only | **Lowest** paid STT minutes | Production voice agent |
+| Wake-word + VAD | Local wake word + VAD | Lowest idle; stronger privacy | Always-on device |
+
+**Barge-in:** while the assistant speaks, do not keep cloud STT open for interrupts. Use local VAD → stop TTS → open/resume STT → send a buffered first ~200–500 ms of mic audio so the first word is not lost → stream until Smart Turn completes the new turn.
+
+| Job | Component |
+|-----|-----------|
+| Speech has begun | Local VAD |
+| Silence ends the user's thought | **Smart Turn v2** |
+| Words during user turn | Gated streaming STT |
+| Answer | Your LLM |
+| Spoken reply | Aura-2, Inworld TTS-2 Flash, etc. |
+| User interrupts agent | Local VAD (not cloud STT) |
+| Cancel playback / generation | App state machine |
+
+Local VAD adds negligible marginal cost; it reduces streaming-STT minutes, egress, silence transcription, and TTS feedback into STT.
 
 ## Smart Turn vs Flux (skim)
 

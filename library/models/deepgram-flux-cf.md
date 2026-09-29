@@ -33,6 +33,8 @@ Anchor for a **cost-controlled, vendor-modular** live voice agent on Workers AI:
 
 Building voice agents that need reliable turn boundaries without buying an integrated multimodal Live model. Stack with your LLM plus **Aura-2** or **MeloTTS** on CF. Prefer **Gemini 3.8 Live** when one Google stack should own audio in, reasoning, tools, and speech out.
 
+For **lower WebSocket spend**, prefer **local VAD + Smart Turn v2 + gated streaming STT** (open Flux only during user speech; see `smart-turn-v2-cf`). Flux is the simpler all-in-one socket when you accept ~$0.0077/min for the full session.
+
 ## Caveats
 
 WebSocket-only; not batch file transcription. Closed Deepgram partner model on Cloudflare. Flux is not the reasoning layer.
